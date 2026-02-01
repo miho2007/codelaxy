@@ -1,9 +1,51 @@
 [
-  { "id": 0, "q": 0, "r": 0, "owner": null, "difficulty": "easy" },
-  { "id": 1, "q": -1, "r": 0, "owner": null, "difficulty": "medium" },
-  { "id": 2, "q": 1, "r": 0, "owner": null, "difficulty": "medium" },
-  { "id": 3, "q": 0, "r": -1, "owner": null, "difficulty": "easy" },
-  { "id": 4, "q": 0, "r": 1, "owner": null, "difficulty": "hard" },
-  { "id": 5, "q": -1, "r": 1, "owner": null, "difficulty": "medium" },
-  { "id": 6, "q": 1, "r": -1, "owner": null, "difficulty": "easy" }
+  {
+    "id": 0,
+    "q": 0,
+    "r": 0,
+    "owner": "red",
+    "difficulty": "medium"
+  },
+  {
+    "id": 1,
+    "q": -1,
+    "r": 0,
+    "owner": "red",
+    "difficulty": "hard"
+  },
+  {
+    "id": 2,
+    "q": 1,
+    "r": 0,
+    "owner": null,
+    "difficulty": "medium"
+  },
+  {
+    "id": 3,
+    "q": 0,
+    "r": -1,
+    "owner": null,
+    "difficulty": "easy"
+  },
+  {
+    "id": 4,
+    "q": 0,
+    "r": 1,
+    "owner": null,
+    "difficulty": "hard"
+  },
+  {
+    "id": 5,
+    "q": -1,
+    "r": 1,
+    "owner": null,
+    "difficulty": "medium"
+  },
+  {
+    "id": 6,
+    "q": 1,
+    "r": -1,
+    "owner": null,
+    "difficulty": "easy"
+  }
 ]
