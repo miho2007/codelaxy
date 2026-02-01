@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Galaxy Login</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #050814;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .login-container {
+      background: rgba(10,15,35,0.9);
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      width: 300px;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: none;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #2563eb;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover { background: #1d4ed8; }
+  </style>
+</head>
+<body>
+
+<div class="login-container">
+  <h2>Galaxy Login</h2>
+  <input type="text" id="discord-username" placeholder="Discord Username">
+  <select id="team-select">
+    <option value="">Choose Team</option>
+    <option value="blue">Blue</option>
+    <option value="red">Red</option>
+  </select>
+  <button id="enter-game">Enter Game</button>
+</div>
+
+<script>
+  document.getElementById("enter-game").addEventListener("click", () => {
+    const username = document.getElementById("discord-username").value.trim();
+    const team = document.getElementById("team-select").value;
+
+    if(!username){
+      alert("Please enter your Discord username.");
+      return;
+    }
+    if(!team){
+      alert("Please choose a team.");
+      return;
+    }
+
+    // Save to localStorage
+    localStorage.setItem("playerUsername", username);
+    localStorage.setItem("playerTeam", team);
+
+    // Redirect to game
+    window.location.href = "main.html";
+  });
+</script>
+
+</body>
+</html>
