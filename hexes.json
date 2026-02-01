@@ -24,8 +24,8 @@
     "id": 3,
     "q": 0,
     "r": -1,
-    "owner": null,
-    "difficulty": "easy"
+    "owner": "red",
+    "difficulty": "medium"
   },
   {
     "id": 4,
