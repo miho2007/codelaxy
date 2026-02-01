@@ -17,8 +17,8 @@
     "id": 2,
     "q": 1,
     "r": 0,
-    "owner": null,
-    "difficulty": "medium"
+    "owner": "red",
+    "difficulty": "hard"
   },
   {
     "id": 3,
