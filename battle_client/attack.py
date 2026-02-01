@@ -2,17 +2,64 @@ import json
 import subprocess
 import sys
 import os
+import random
 
-HEXES_FILE = "../data/hexes.json"
+HEXES_FILE = "../hexes.json"
 SESSION_FILE = "session.json"
-PROBLEM_ID = "hello_world"
 
 DIFFICULTY_ORDER = ["easy", "medium", "hard"]
 
-print("🌌 Galaxy Battle Client")
-print("-----------------------")
+
+# ---------- GIT HELPER ----------
+def run_git(cmd, fail_msg):
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(fail_msg)
+        print(result.stderr)
+        sys.exit(1)
+
+
+# ---------- LOAD PROBLEM BY DIFFICULTY ----------
+def load_problem_for_difficulty(difficulty):
+    problems_dir = f"problems/{difficulty}"
+    tests_dir = f"tests/{difficulty}"
+
+    if not os.path.isdir(problems_dir):
+        print(f"❌ No problems directory for difficulty '{difficulty}'")
+        sys.exit(1)
+
+    problem_files = [f for f in os.listdir(problems_dir) if f.endswith(".json")]
+
+    if not problem_files:
+        print(f"❌ No problems found for difficulty '{difficulty}'")
+        sys.exit(1)
+
+    problem_file = random.choice(problem_files)
+    problem_id = problem_file.replace(".json", "")
+
+    with open(f"{problems_dir}/{problem_file}", "r") as f:
+        problem = json.load(f)
+
+    test_file = f"{tests_dir}/{problem_id}_test.json"
+    if not os.path.exists(test_file):
+        print(f"❌ Test file missing: {test_file}")
+        sys.exit(1)
+
+    with open(test_file, "r") as f:
+        test = json.load(f)
+
+    return problem_id, problem, test
+
+
+# ---------- SYNC ----------
+print("🔄 Syncing galaxy state...")
+run_git(["git", "pull"], "❌ Git pull failed. Fix repo state and try again.")
+
 
 # ---------- LOGIN ----------
+print("\n🌌 Galaxy Battle Client")
+print("-----------------------")
+
 if os.path.exists(SESSION_FILE):
     with open(SESSION_FILE, "r") as f:
         session = json.load(f)
@@ -32,17 +79,23 @@ else:
 
     print(f"✅ Logged in as {username} (Team {team})")
 
-print("-----------------------")
+
+# ---------- LOAD HEXES ----------
+with open(HEXES_FILE, "r") as f:
+    hexes = json.load(f)
+
+print("\n🗺️ Galaxy Map:")
+for h in hexes:
+    owner = h["owner"] if h["owner"] else "neutral"
+    print(f"  Hex {h['id']} | owner: {owner} | difficulty: {h['difficulty']}")
+
 
 # ---------- CHOOSE HEX ----------
 try:
-    hex_id = int(input("Enter Hex ID to attack: "))
+    hex_id = int(input("\nEnter Hex ID to attack: "))
 except ValueError:
     print("❌ Hex ID must be a number")
     sys.exit(1)
-
-with open(HEXES_FILE, "r") as f:
-    hexes = json.load(f)
 
 hex_tile = next((h for h in hexes if h["id"] == hex_id), None)
 
@@ -50,20 +103,26 @@ if not hex_tile:
     print("❌ Hex not found")
     sys.exit(1)
 
-print(f"\nAttacking Hex {hex_id}")
-print("Current owner:", hex_tile["owner"])
-print("Difficulty:", hex_tile["difficulty"])
+if hex_tile["owner"] == session["team"]:
+    print("❌ You already own this hex.")
+    sys.exit(1)
+
+previous_owner = hex_tile["owner"]
+difficulty = hex_tile["difficulty"]
+
+print(f"\n⚔️ Attacking Hex {hex_id}")
+print("Owner:", previous_owner)
+print("Difficulty:", difficulty)
+
 
 # ---------- LOAD PROBLEM ----------
-with open(f"problems/{PROBLEM_ID}.json", "r") as f:
-    problem = json.load(f)
+problem_id, problem, test = load_problem_for_difficulty(difficulty)
 
-with open(f"tests/{PROBLEM_ID}_test.json", "r") as f:
-    test = json.load(f)
-
-print("\nProblem:", problem["title"])
+print("\n📜 Problem:", problem["title"])
+print("Difficulty:", difficulty)
 print(problem["description"])
-input("\nPress ENTER to run tests...")
+input("\nPress ENTER when ready to run tests...")
+
 
 # ---------- RUN SOLUTION ----------
 try:
@@ -80,6 +139,7 @@ except Exception as e:
 stdout = result.stdout.strip()
 expected = test["expected_stdout"].strip()
 
+
 # ---------- JUDGE ----------
 print("\n-----------------------")
 
@@ -91,28 +151,44 @@ if stdout != expected:
 
 print("✅ PASS")
 
-# ---------- CAPTURE LOGIC ----------
-previous_owner = hex_tile["owner"]
 
-# Update owner
+# ---------- RELOAD HEXES (RACE CHECK) ----------
+with open(HEXES_FILE, "r") as f:
+    fresh_hexes = json.load(f)
+
+fresh_hex = next(h for h in fresh_hexes if h["id"] == hex_id)
+
+if fresh_hex["owner"] != previous_owner:
+    print("⚠️ Hex state changed during attack. Try again.")
+    sys.exit(1)
+
+
+# ---------- CAPTURE ----------
 hex_tile["owner"] = session["team"]
 
-# Increase difficulty safely
-current_diff = hex_tile["difficulty"]
-if current_diff in DIFFICULTY_ORDER:
-    idx = DIFFICULTY_ORDER.index(current_diff)
+if difficulty in DIFFICULTY_ORDER:
+    idx = DIFFICULTY_ORDER.index(difficulty)
     if idx < len(DIFFICULTY_ORDER) - 1:
         hex_tile["difficulty"] = DIFFICULTY_ORDER[idx + 1]
 
-# Save back to JSON
+
+# ---------- SAVE ----------
 with open(HEXES_FILE, "w") as f:
     json.dump(hexes, f, indent=2)
 
-# ---------- RESULT ----------
-if previous_owner is None:
-    print(f"🌟 Hex {hex_id} CAPTURED!")
-else:
-    print(f"⚔️ Hex {hex_id} RE-CAPTURED!")
 
+# ---------- COMMIT + PUSH ----------
+commit_msg = (
+    f"Capture hex {hex_id} by {session['username']} "
+    f"({session['team']}) [{difficulty}->{hex_tile['difficulty']}] "
+    f"problem:{problem_id}"
+)
+
+print("\n📦 Publishing conquest...")
+run_git(["git", "add", HEXES_FILE], "❌ Git add failed")
+run_git(["git", "commit", "-m", commit_msg], "❌ Git commit failed")
+run_git(["git", "push"], "❌ Git push failed")
+
+print("🚀 Capture complete!")
 print("New owner:", hex_tile["owner"])
 print("New difficulty:", hex_tile["difficulty"])
