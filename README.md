@@ -76,6 +76,11 @@ This introduces **strategic decision-making** alongside algorithmic skill.
 - 📊 JSON-driven map and game state
 
 ---
+### Hex map on website
+<img width="873" height="705" alt="image" src="https://github.com/user-attachments/assets/a9a53f99-3bdd-4a8c-84d4-0f0ca93a27f3" />
+
+
+### CLI tool
 <img width="1021" height="792" alt="image" src="https://github.com/user-attachments/assets/2dacfed3-f77f-4918-b5df-23d783e198d4" />
 
 
