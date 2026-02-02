@@ -88,11 +88,29 @@ This introduces **strategic decision-making** alongside algorithmic skill.
 
 ---
 
-
+## 🖥️ Using the Python CLI Tool
 
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/miho2007/codelaxy.git
 cd codelaxy
+```
+### 2. Run CLI tool
+```bash
+cd battle_client
+python attack.py
+```
 
 
+On launch, the CLI automatically runs:
+
+```bash
+git pull
+```
+to sync the latest hexagon ownership data.
+
+
+
+### Created by Miho
+📧 Email: mzhaviamikheil@gmail.com
+🔗 GitHub: https://github.com/miho2007
