@@ -45,7 +45,7 @@
     "id": 6,
     "q": 1,
     "r": -1,
-    "owner": null,
-    "difficulty": "easy"
+    "owner": "red",
+    "difficulty": "medium"
   }
 ]
