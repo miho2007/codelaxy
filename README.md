@@ -109,7 +109,7 @@ git pull
 ```
 to sync the latest hexagon ownership data.
 
-
+---
 
 ### Created by Miho
 📧 Email: mzhaviamikheil@gmail.com
